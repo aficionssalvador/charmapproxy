@@ -82,9 +82,9 @@ namespace cat.srigau.charmapproxy
             var serverStream = client.GetStream();
             var remoteStream = _remoteClient.GetStream();
 
+            // todo: mapeig del set de caracters en entrada i en sortida nou objecte stream basat am el memory stream
+
             await Task.WhenAny(remoteStream.CopyToAsync(serverStream), serverStream.CopyToAsync(remoteStream));
-
-
 
           }
         }
