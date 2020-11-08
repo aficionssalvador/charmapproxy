@@ -5,10 +5,16 @@
     "forwardIp": "127.0.0.1",
     "forwardPort": 23,
     "client2server": [
-      [ 0, 0 ]
+      {
+        "s": 0,
+        "d": 0
+      }
     ],
     "server2client": [
-      [ 0, 0 ]
+      {
+        "s": 0,
+        "d": 0
+      }
     ]
   }
 }

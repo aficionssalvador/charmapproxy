@@ -5,13 +5,14 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace cat.srigau.charmapproxy
 {
   class TcpProxy : IProxy
   {
-    public async Task Start(string remoteServerIp, ushort remoteServerPort, ushort localPort, string localIp)
+    public async Task Start(string remoteServerIp, ushort remoteServerPort, ushort localPort, string localIp, byte[] byteMapClient2Setver, byte[] byteMapSetver2Client)
     {
       //var clients = new ConcurrentDictionary<IPEndPoint, TcpClient>();
 
@@ -30,7 +31,7 @@ namespace cat.srigau.charmapproxy
           remoteClient.NoDelay = true;
           var ips = await Dns.GetHostAddressesAsync(remoteServerIp);
 
-          new TcpClient(remoteClient, new IPEndPoint(ips.First(), remoteServerPort));
+          new TcpClient(remoteClient, new IPEndPoint(ips.First(), remoteServerPort), byteMapClient2Setver, byteMapSetver2Client);
 
 
         }
@@ -50,12 +51,28 @@ namespace cat.srigau.charmapproxy
     private System.Net.Sockets.TcpClient _remoteClient;
     private IPEndPoint _clientEndpoint;
     private IPEndPoint _remoteServer;
-
-    public TcpClient(System.Net.Sockets.TcpClient remoteClient, IPEndPoint remoteServer)
+    private byte[] byteMapClient2Setver;
+    private byte[] byteMapSetver2Client;
+    public TcpClient(System.Net.Sockets.TcpClient remoteClient, IPEndPoint remoteServer, byte[] byteMapClient2SetverPar, byte[] byteMapSetver2ClientPar)
     {
+      byteMapClient2Setver = new byte[byteMapClient2SetverPar.Length];  byteMapClient2SetverPar.CopyTo(byteMapClient2Setver,0);
+      byteMapSetver2Client = new byte[byteMapSetver2ClientPar.Length];  byteMapSetver2ClientPar.CopyTo(byteMapSetver2Client,0);
+      if ( byteMapClient2Setver.Length != 256) {
+        byteMapClient2Setver = new byte[265];
+        for (int i = 0; i < 256; i++)
+        {
+          byteMapClient2Setver[i] = (byte)i;
+        }
+      }
+      if (byteMapSetver2Client.Length != 256)
+      {
+        byteMapSetver2Client = new byte[265];
+        for (int i = 0; i < 256; i++)
+        {
+          byteMapSetver2Client[i] = (byte)i;
+        }
+      }
       _remoteClient = remoteClient;
-
-
       _remoteServer = remoteServer;
       client.NoDelay = true;
       _clientEndpoint = (IPEndPoint)_remoteClient.Client.RemoteEndPoint;
@@ -75,16 +92,19 @@ namespace cat.srigau.charmapproxy
       {
         try
         {
+          CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+          CancellationToken cancellationToken = cancellationTokenSource.Token;
           using (_remoteClient)
           using (client)
           {
             await client.ConnectAsync(_remoteServer.Address, _remoteServer.Port);
             var serverStream = client.GetStream();
             var remoteStream = _remoteClient.GetStream();
+            CancellationTokenSource cancellationTokenSource2 = new CancellationTokenSource();
+            CancellationToken cancellationToken2 = cancellationTokenSource.Token;
 
-            // todo: mapeig del set de caracters en entrada i en sortida nou objecte stream basat am el memory stream
-
-            await Task.WhenAny(remoteStream.CopyToAsync(serverStream), serverStream.CopyToAsync(remoteStream));
+            // await Task.WhenAny(remoteStream.CopyToAsync(serverStream), serverStream.CopyToAsync(remoteStream));
+            await Task.WhenAny(StreamCopy.CopyToAsync3(remoteStream,serverStream,1536, byteMapClient2Setver, cancellationToken), StreamCopy.CopyToAsync3(serverStream,remoteStream,1536, byteMapSetver2Client, cancellationToken2) );
 
           }
         }

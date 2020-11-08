@@ -7,6 +7,8 @@ namespace cat.srigau.charmapproxy
 {
   class Program
   {
+    static private byte[] byteMapClient2Setver;
+    static private byte[] byteMapSetver2Client;
     static void Main(string[] args)
     {
       try
@@ -15,26 +17,34 @@ namespace cat.srigau.charmapproxy
         var configJson = System.IO.File.ReadAllText("config.json");
         // json a objete
         var configs = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, ProxyConfig>>(configJson);
-
+        
+        byteMapClient2Setver = new byte[265];
+        for (int i = 0; i < 256; i++)
+        {
+          byteMapClient2Setver[i] = (byte)i;
+        }
+        byteMapSetver2Client = new byte[265];
+        for (int i = 0; i < 256; i++)
+        {
+          byteMapSetver2Client[i] = (byte)i;
+        }
 
         Task.WhenAll(configs.Select(c =>
         {
-          /*
-          for(byte b = 0; b <=255; b++)
+          for (int  i=0; i < c.Value.client2server.Length; i++)
           {
-            c.Value.client2server[b] = b;
+            byteMapClient2Setver[c.Value.client2server[i].s] = (byte)c.Value.client2server[i].s;
           }
-          if (c.Value.client2server.Count > 0)
+          for (int i = 0; i < c.Value.server2client.Length; i++)
           {
-            foreach
-
-          }*/
+            byteMapSetver2Client[c.Value.server2client[i].s] = (byte)c.Value.server2client[i].s;
+          }
           if (c.Value.protocol == "tcp")
           {
             try
             {
               var proxy = new TcpProxy();
-              return proxy.Start(c.Value.forwardIp, c.Value.forwardPort, c.Value.localPort, c.Value.localIp);
+              return proxy.Start(c.Value.forwardIp, c.Value.forwardPort, c.Value.localPort, c.Value.localIp, byteMapClient2Setver, byteMapSetver2Client);
             }
             catch (Exception ex)
             {
@@ -66,11 +76,17 @@ namespace cat.srigau.charmapproxy
     public string localIp { get; set; }
     public string forwardIp { get; set; }
     public ushort forwardPort { get; set; }
-    //public List<{Byte, Byte }> client2server { get; set; }
-    //public List<Byte> server2client { get; set; }
+    public Map1Byte[] client2server { get; set; }
+    public Map1Byte[] server2client { get; set; }
+  }
+
+  public class Map1Byte
+  {
+  public int s;
+  public int d;
   }
   interface IProxy
   {
-    Task Start(string remoteServerIp, ushort remoteServerPort, ushort localPort, string localIp = null);
+    Task Start(string remoteServerIp, ushort remoteServerPort, ushort localPort, string localIp , byte[] byteMapClient2Setver, byte[] byteMapSetver2Client);
   }
 }
