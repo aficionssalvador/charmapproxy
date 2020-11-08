@@ -14,9 +14,9 @@ Es un proxy basado en la capa tcp del proxy desarrollado por https://github.com/
 telnet client <--> CharMapProxy <--> telnet server
 ```
 
-El fitxer de configuració segueix  el següent format:
+The configuration file follows the following format:
 
-El byte origren es "s" i el byte destí del mapeix es "d". 
+The source byte is "s" and the destination byte of the map is "d".
 
 ---
 
@@ -46,10 +46,3 @@ El byte origen es "s" i el byte destí del mapeig es "d".
 }
 ```
 
-It is a proxy for telnet connections that allows the conversion of the character set with 8-bit character sets for example set IN2 to ANSI
-
-It is a proxy based on the tcp layer of the proxy developed by https://github.com/Stormancer/netproxy
-
-The configuration file follows the following format:
-
-The source byte is "s" and the destination byte of the map is "d".
