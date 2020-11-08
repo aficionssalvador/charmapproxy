@@ -11,11 +11,11 @@ namespace cat.srigau.charmapproxy
   {
     const int _DefaultBufferSize = 1536;
     public static async Task CopyToAsync3(
-    this Stream source,
-    Stream destination,
-    int bufferSize,
-    byte[] mybytemap,
-    CancellationToken cancellationToken)
+      this Stream source,
+      Stream destination,
+      int bufferSize,
+      byte[] mybytemap,
+      CancellationToken cancellationToken)
     {
       if (0 == bufferSize)
         bufferSize = _DefaultBufferSize;
@@ -32,7 +32,7 @@ namespace cat.srigau.charmapproxy
           break;
         //if (0 == bytesRead)
         //  break;
-        for(int i = 0; i < bytesRead; i++)
+        for (int i = 0; i < bytesRead; i++)
           buffermaped[i] = mybytemap[(int)buffer[i]];
         await destination.WriteAsync(buffermaped, 0, bytesRead);
         //destination.Write(buffer, 0, bytesRead);
