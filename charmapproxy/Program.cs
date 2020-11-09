@@ -18,12 +18,12 @@ namespace cat.srigau.charmapproxy
         // json a objete
         var configs = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, ProxyConfig>>(configJson);
         
-        byteMapClient2Setver = new byte[265];
+        byteMapClient2Setver = new byte[256];
         for (int i = 0; i < 256; i++)
         {
           byteMapClient2Setver[i] = (byte)i;
         }
-        byteMapSetver2Client = new byte[265];
+        byteMapSetver2Client = new byte[256];
         for (int i = 0; i < 256; i++)
         {
           byteMapSetver2Client[i] = (byte)i;
@@ -33,11 +33,11 @@ namespace cat.srigau.charmapproxy
         {
           for (int  i=0; i < c.Value.client2server.Length; i++)
           {
-            byteMapClient2Setver[c.Value.client2server[i].s] = (byte)c.Value.client2server[i].s;
+            byteMapClient2Setver[c.Value.client2server[i].s] = (byte)c.Value.client2server[i].d;
           }
           for (int i = 0; i < c.Value.server2client.Length; i++)
           {
-            byteMapSetver2Client[c.Value.server2client[i].s] = (byte)c.Value.server2client[i].s;
+            byteMapSetver2Client[c.Value.server2client[i].s] = (byte)c.Value.server2client[i].d;
           }
           if (c.Value.protocol == "tcp")
           {
