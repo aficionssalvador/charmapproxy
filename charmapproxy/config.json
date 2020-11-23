@@ -3,7 +3,7 @@
     "localport": 9923,
     "protocol": "tcp",
     "forwardIp": "127.0.0.1",
-    "forwardIpKATIA": "192.168.2.35",
+    "forwardIpK": "192.168.2.35",
     "forwardPort": 23,
     "server2client": [
       {
