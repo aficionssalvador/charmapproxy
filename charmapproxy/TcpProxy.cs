@@ -53,6 +53,8 @@ namespace cat.srigau.charmapproxy
     private IPEndPoint _remoteServer;
     private byte[] byteMapClient2Setver;
     private byte[] byteMapSetver2Client;
+    private bool IACmodeClient2Server;
+    private bool IACmodeServer2Client;
     public TcpClient(System.Net.Sockets.TcpClient remoteClient, IPEndPoint remoteServer, byte[] byteMapClient2SetverPar, byte[] byteMapSetver2ClientPar)
     {
       byteMapClient2Setver = new byte[byteMapClient2SetverPar.Length];  byteMapClient2SetverPar.CopyTo(byteMapClient2Setver,0);
@@ -72,6 +74,8 @@ namespace cat.srigau.charmapproxy
           byteMapSetver2Client[i] = (byte)i;
         }
       }
+      IACmodeClient2Server = false;
+      IACmodeServer2Client = false; 
       _remoteClient = remoteClient;
       _remoteServer = remoteServer;
       client.NoDelay = true;
@@ -87,7 +91,6 @@ namespace cat.srigau.charmapproxy
 
     private void Run()
     {
-
       Task.Run(async () =>
       {
         try
@@ -104,8 +107,9 @@ namespace cat.srigau.charmapproxy
             CancellationToken cancellationToken2 = cancellationTokenSource.Token;
 
             // await Task.WhenAny(remoteStream.CopyToAsync(serverStream), serverStream.CopyToAsync(remoteStream));
-            await Task.WhenAny(StreamCopy.CopyToAsync3(remoteStream,serverStream,1536, byteMapClient2Setver, cancellationToken), StreamCopy.CopyToAsync3(serverStream,remoteStream,1536, byteMapSetver2Client, cancellationToken2) );
-
+            // await Task.WhenAll(StreamCopy.CopyToAsync3(remoteStream, serverStream, 1536, byteMapClient2Setver, cancellationToken), 
+            //  StreamCopy.CopyToAsync3(serverStream, remoteStream, 1536, byteMapSetver2Client, cancellationToken2));
+            await Task.WhenAny(StreamCopy.CopyToAsync3(remoteStream, serverStream, 1536, byteMapClient2Setver, cancellationToken), StreamCopy.CopyToAsync4(serverStream, remoteStream, 1536, byteMapSetver2Client, cancellationToken2));
           }
         }
         catch (Exception) { }
